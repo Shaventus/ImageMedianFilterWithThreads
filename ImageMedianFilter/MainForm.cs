@@ -13,6 +13,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Diagnostics;
 
 namespace ImageMedianFilter
 {
@@ -21,12 +22,15 @@ namespace ImageMedianFilter
         private Bitmap originalBitmap = null;
         private Bitmap previewBitmap = null;
         private Bitmap resultBitmap = null;
+        private float time = 0;
         
         public MainForm()
         {
             InitializeComponent();
 
             cmbEdgeDetection.SelectedIndex = 0;
+            cmbThreads.SelectedIndex = 0;
+            lblTime.Text = "";
         }
 
         private void btnOpenOriginal_Click(object sender, EventArgs e)
@@ -106,32 +110,58 @@ namespace ImageMedianFilter
             if (selectedSource != null)
             {
                 //  Optimization
+                int threads = 1;
+                switch (cmbThreads.SelectedIndex.ToString())
+                {
+                    case "1":
+                        threads = 1;
+                        break;
+                    case "2":
+                        threads = 2;
+                        break;
+                    case "4":
+                        threads = 4;
+                        break;
+                    case "6":
+                        threads = 6;
+                        break;
+                    case "8":
+                        threads = 8;
+                        break;
+                    default:
+                        threads = 1;
+                        break;
+                }
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
                 switch (cmbEdgeDetection.SelectedItem.ToString())
                 {
                     case "None":
                         break;
                     case "Median 3x3":
-                        bitmapResult = selectedSource.MedianFilter(3);
+                        bitmapResult = selectedSource.MedianFilter(3, threads);
                         break;
                     case "Median 5x5":
-                        bitmapResult = selectedSource.MedianFilter(5);
+                        bitmapResult = selectedSource.MedianFilter(5, threads);
                         break;
                     case "Median 7x7":
-                        bitmapResult = selectedSource.MedianFilter(7);
+                        bitmapResult = selectedSource.MedianFilter(7, threads);
                         break;
                     case "Median 9x9":
-                        bitmapResult = selectedSource.MedianFilter(9);
+                        bitmapResult = selectedSource.MedianFilter(9, threads);
                         break;
                     case "Median 11x11":
-                        bitmapResult = selectedSource.MedianFilter(11);
+                        bitmapResult = selectedSource.MedianFilter(11, threads);
                         break;
                     case "Median 13x13":
-                        bitmapResult = selectedSource.MedianFilter(12);
+                        bitmapResult = selectedSource.MedianFilter(12, threads);
                         break;
                     default:
                         bitmapResult = selectedSource;
                         break;
                 }
+                stopwatch.Stop();
+                time = stopwatch.ElapsedTicks;
                 //
             }
 
@@ -146,9 +176,15 @@ namespace ImageMedianFilter
                     resultBitmap = bitmapResult;
                 }
             }
+            lblTime.Text = "Ticks: " + time.ToString();
         }
 
         private void NeighbourCountValueChangedEventHandler(object sender, EventArgs e)
+        {
+            ApplyFilter(true);
+        }
+
+        private void cmbThreads_SelectedIndexChanged(object sender, EventArgs e)
         {
             ApplyFilter(true);
         }

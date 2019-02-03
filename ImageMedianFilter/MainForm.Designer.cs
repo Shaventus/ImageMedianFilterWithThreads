@@ -32,6 +32,9 @@
             this.btnOpenOriginal = new System.Windows.Forms.Button();
             this.btnSaveNewImage = new System.Windows.Forms.Button();
             this.cmbEdgeDetection = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cmbThreads = new System.Windows.Forms.ComboBox();
+            this.lblTime = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -89,10 +92,49 @@
             this.cmbEdgeDetection.TabIndex = 20;
             this.cmbEdgeDetection.SelectedIndexChanged += new System.EventHandler(this.NeighbourCountValueChangedEventHandler);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label1.Location = new System.Drawing.Point(12, 677);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(114, 31);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "Threads";
+            // 
+            // cmbThreads
+            // 
+            this.cmbThreads.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.cmbThreads.FormattingEnabled = true;
+            this.cmbThreads.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "4",
+            "6",
+            "8"});
+            this.cmbThreads.Location = new System.Drawing.Point(132, 676);
+            this.cmbThreads.Name = "cmbThreads";
+            this.cmbThreads.Size = new System.Drawing.Size(121, 32);
+            this.cmbThreads.TabIndex = 22;
+            this.cmbThreads.SelectedIndexChanged += new System.EventHandler(this.cmbThreads_SelectedIndexChanged);
+            // 
+            // lblTime
+            // 
+            this.lblTime.AutoSize = true;
+            this.lblTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTime.Location = new System.Drawing.Point(292, 672);
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(0, 31);
+            this.lblTime.TabIndex = 23;
+            // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(624, 675);
+            this.ClientSize = new System.Drawing.Size(632, 721);
+            this.Controls.Add(this.lblTime);
+            this.Controls.Add(this.cmbThreads);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbEdgeDetection);
             this.Controls.Add(this.btnSaveNewImage);
             this.Controls.Add(this.btnOpenOriginal);
@@ -105,6 +147,7 @@
             this.Text = "Image Median Filter";
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -114,6 +157,9 @@
         private System.Windows.Forms.Button btnOpenOriginal;
         private System.Windows.Forms.Button btnSaveNewImage;
         private System.Windows.Forms.ComboBox cmbEdgeDetection;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox cmbThreads;
+        private System.Windows.Forms.Label lblTime;
     }
 }
 

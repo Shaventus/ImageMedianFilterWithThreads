@@ -146,13 +146,11 @@ namespace ImageMedianFilter
             return bitmapResult;
         }
 
-        public static Bitmap MedianFilter(this Bitmap sourceBitmap, 
-                                                int matrixSize,  
-                                                  int bias = 0, 
-                                         bool grayscale = false) 
+        public static Bitmap MedianFilter(this Bitmap sourceBitmap, int matrixSize, int threads,
+                                                  int bias = 0, bool grayscale = false) 
         {
             // liczba watkow
-            int n = 4;
+            int n = threads;
 
             BitmapData sourceData = 
                        sourceBitmap.LockBits(new Rectangle(0, 0,
@@ -199,7 +197,7 @@ namespace ImageMedianFilter
                 w[i].Start();
             }
 
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 w[i].Join();
             }
