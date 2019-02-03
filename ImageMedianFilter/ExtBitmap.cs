@@ -19,7 +19,7 @@ namespace ImageMedianFilter
     // ADD
     public class Calculation
     {
-
+        static Mutex _mutex = new Mutex();
         public int matrixSize; 
         public Bitmap sourceBitmap;
         public BitmapData sourceData;
@@ -29,8 +29,9 @@ namespace ImageMedianFilter
         public int threadSize;
 
         // Constructor
-        public Calculation(int matrixSize, Bitmap sourceBitmap, BitmapData sourceData, byte[] pixelBuffer, byte[] resultBuffer,
-            int thread, int threadSize)
+        public Calculation(int matrixSize, Bitmap sourceBitmap, BitmapData sourceData,
+                            byte[] pixelBuffer, byte[] resultBuffer,
+                            int thread, int threadSize)
         {
             this.matrixSize = matrixSize;
             this.sourceBitmap = sourceBitmap;
@@ -52,48 +53,62 @@ namespace ImageMedianFilter
             List<int> neighbourPixels = new List<int>();
             byte[] middlePixel;
 
-            Debug.Write("Thread: " + thread);
+            _mutex.WaitOne();
+            int threadInterations = (this.sourceBitmap.Height - filterOffset) / threadSize;
+            int stopX = this.sourceBitmap.Width - filterOffset;
+            _mutex.ReleaseMutex();
 
-            for (int offsetY = filterOffset; offsetY <
-                sourceBitmap.Height- filterOffset; offsetY++)
+            int start = (threadInterations * thread);
+            int stop = threadInterations * (thread + 1);
+            if (thread == 0)
+            {
+                start += filterOffset;
+            }
+            else if (thread == threadSize - 1)
+            {
+                stop = sourceBitmap.Height - filterOffset;
+            }
+
+            for (int offsetY = start; offsetY <
+                stop; offsetY++)
             {
                 for (int offsetX = filterOffset; offsetX <
-                    sourceBitmap.Width - filterOffset; offsetX++)
+                    stopX; offsetX++)
                 {
-                    byteOffset = offsetY *
-                                 sourceData.Stride +
-                                 offsetX * 4;
+                        byteOffset = offsetY *
+                             sourceData.Stride +
+                             offsetX * 4;
 
-                    neighbourPixels.Clear();
+                        neighbourPixels.Clear();
 
-                    for (int filterY = -filterOffset;
-                        filterY <= filterOffset; filterY++)
-                    {
-                        for (int filterX = -filterOffset;
-                            filterX <= filterOffset; filterX++)
+                        for (int filterY = -filterOffset;
+                            filterY <= filterOffset; filterY++)
                         {
+                            for (int filterX = -filterOffset;
+                                filterX <= filterOffset; filterX++)
+                            {
 
-                            calcOffset = byteOffset +
-                                         (filterX * 4) +
-                                         (filterY * sourceData.Stride);
+                                calcOffset = byteOffset +
+                                             (filterX * 4) +
+                                             (filterY * sourceData.Stride);
 
-                            neighbourPixels.Add(BitConverter.ToInt32(
-                                             pixelBuffer, calcOffset));
+                                neighbourPixels.Add(BitConverter.ToInt32(
+                                                 pixelBuffer, calcOffset));
+                            }
                         }
+
+                        neighbourPixels.Sort();
+
+                        middlePixel = BitConverter.GetBytes(
+                                           neighbourPixels[filterOffset]);
+
+                        resultBuffer[byteOffset] = middlePixel[0];
+                        resultBuffer[byteOffset + 1] = middlePixel[1];
+                        resultBuffer[byteOffset + 2] = middlePixel[2];
+                        resultBuffer[byteOffset + 3] = middlePixel[3];
                     }
 
-                    neighbourPixels.Sort();
-
-                    middlePixel = BitConverter.GetBytes(
-                                       neighbourPixels[filterOffset]);
-
-                    resultBuffer[byteOffset] = middlePixel[0];
-                    resultBuffer[byteOffset + 1] = middlePixel[1];
-                    resultBuffer[byteOffset + 2] = middlePixel[2];
-                    resultBuffer[byteOffset + 3] = middlePixel[3];
-                }
             }
-            Debug.Write("Watek skonczył zadanie");
         }
     }
 
@@ -176,10 +191,10 @@ namespace ImageMedianFilter
 
             // Utworzenie n watkow
             Thread[] w = new Thread[n];
-            /*
+            
             for(int i = 0; i < n; i++)
             {
-                Calculation calculation = new Obliczenia(matrixSize, sourceBitmap, sourceData, pixelBuffer, resultBuffer, i, n);
+                Calculation calculation = new Calculation(matrixSize, sourceBitmap, sourceData, pixelBuffer, resultBuffer, i, n);
                 w[i] = new Thread(new ThreadStart(calculation.MedianFilterCalculator));
                 w[i].Start();
             }
@@ -188,10 +203,6 @@ namespace ImageMedianFilter
             {
                 w[i].Join();
             }
-            */
-
-            Calculation calculation = new Calculation(matrixSize, sourceBitmap, sourceData, pixelBuffer, resultBuffer, 0, n);
-            calculation.MedianFilterCalculator();
 
             Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, 
                                              sourceBitmap.Height);
