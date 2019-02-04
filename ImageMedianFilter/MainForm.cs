@@ -22,8 +22,8 @@ namespace ImageMedianFilter
         private Bitmap originalBitmap = null;
         private Bitmap previewBitmap = null;
         private Bitmap resultBitmap = null;
-        private float time = 0;
-        
+        Stopwatch stopwatch;
+
         public MainForm()
         {
             InitializeComponent();
@@ -111,7 +111,7 @@ namespace ImageMedianFilter
             {
                 //  Optimization
                 int threads = 1;
-                switch (cmbThreads.SelectedIndex.ToString())
+                switch (cmbThreads.SelectedItem.ToString())
                 {
                     case "1":
                         threads = 1;
@@ -132,7 +132,8 @@ namespace ImageMedianFilter
                         threads = 1;
                         break;
                 }
-                Stopwatch stopwatch = new Stopwatch();
+
+                stopwatch = new Stopwatch();
                 stopwatch.Start();
                 switch (cmbEdgeDetection.SelectedItem.ToString())
                 {
@@ -161,7 +162,6 @@ namespace ImageMedianFilter
                         break;
                 }
                 stopwatch.Stop();
-                time = stopwatch.ElapsedTicks;
                 //
             }
 
@@ -176,7 +176,7 @@ namespace ImageMedianFilter
                     resultBitmap = bitmapResult;
                 }
             }
-            lblTime.Text = "Ticks: " + time.ToString();
+            lblTime.Text = "Time: " + stopwatch.Elapsed.TotalSeconds;
         }
 
         private void NeighbourCountValueChangedEventHandler(object sender, EventArgs e)

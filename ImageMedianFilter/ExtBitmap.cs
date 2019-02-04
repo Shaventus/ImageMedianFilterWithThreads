@@ -64,7 +64,8 @@ namespace ImageMedianFilter
             {
                 start += filterOffset;
             }
-            else if (thread == threadSize - 1)
+
+            if (thread == threadSize - 1)
             {
                 stop = sourceBitmap.Height - filterOffset;
             }
@@ -75,38 +76,38 @@ namespace ImageMedianFilter
                 for (int offsetX = filterOffset; offsetX <
                     stopX; offsetX++)
                 {
-                        byteOffset = offsetY *
-                             sourceData.Stride +
-                             offsetX * 4;
+                    byteOffset = offsetY *
+                            sourceData.Stride +
+                            offsetX * 4;
 
-                        neighbourPixels.Clear();
+                    neighbourPixels.Clear();
 
-                        for (int filterY = -filterOffset;
-                            filterY <= filterOffset; filterY++)
+                    for (int filterY = -filterOffset;
+                        filterY <= filterOffset; filterY++)
+                    {
+                        for (int filterX = -filterOffset;
+                            filterX <= filterOffset; filterX++)
                         {
-                            for (int filterX = -filterOffset;
-                                filterX <= filterOffset; filterX++)
-                            {
 
-                                calcOffset = byteOffset +
-                                             (filterX * 4) +
-                                             (filterY * sourceData.Stride);
+                            calcOffset = byteOffset +
+                                            (filterX * 4) +
+                                            (filterY * sourceData.Stride);
 
-                                neighbourPixels.Add(BitConverter.ToInt32(
-                                                 pixelBuffer, calcOffset));
-                            }
+                            neighbourPixels.Add(BitConverter.ToInt32(
+                                                pixelBuffer, calcOffset));
                         }
-
-                        neighbourPixels.Sort();
-
-                        middlePixel = BitConverter.GetBytes(
-                                           neighbourPixels[filterOffset]);
-
-                        resultBuffer[byteOffset] = middlePixel[0];
-                        resultBuffer[byteOffset + 1] = middlePixel[1];
-                        resultBuffer[byteOffset + 2] = middlePixel[2];
-                        resultBuffer[byteOffset + 3] = middlePixel[3];
                     }
+
+                    neighbourPixels.Sort();
+
+                    middlePixel = BitConverter.GetBytes(
+                                        neighbourPixels[filterOffset]);
+
+                    resultBuffer[byteOffset] = middlePixel[0];
+                    resultBuffer[byteOffset + 1] = middlePixel[1];
+                    resultBuffer[byteOffset + 2] = middlePixel[2];
+                    resultBuffer[byteOffset + 3] = middlePixel[3];
+                }
 
             }
         }
